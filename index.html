@@ -8,8 +8,8 @@
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
-        margin: 10px;
-        padding: 10px;
+        margin: 0;
+        padding: 0;
     }
     .container {
         max-width: 800px;
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchEvents() {
         const response = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'CalendarData!A2:I'
+            range: 'CalendarData!A2:I' // Assuming data starts from A2 and ends at I (adjust range as needed)
         });
 
         const eventsData = response.result.values;
@@ -92,13 +92,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const eventDiv = document.createElement('div');
                     eventDiv.classList.add('event');
 
-                    const startTime = allDay ? 'FALSE' : new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const endTime = allDay ? 'FALSE' : new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    const eventHTML = `
-                        <h3>${subject}</h3>
-                        ${!allDay ? `<p><strong>Start:</strong> ${startTime}</p>` : ''}
-                        ${!allDay ? `<p><strong>End:</strong> ${endTime}</p>` : ''}
+                    let eventHTML = `<h3>${subject}</h3>`;
+                    if (!allDay) {
+                        const startTime = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const endTime = new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        eventHTML += `<p><strong>Start:</strong> ${startTime}</p>`;
+                        eventHTML += `<p><strong>End:</strong> ${endTime}</p>`;
+                    }
+                    
+                    eventHTML += `
                         <p><strong>All Day:</strong> ${allDay}</p>
                         <p><strong>Show As:</strong> ${showAs}</p>
                         <p><strong>Location:</strong> ${location}</p>
