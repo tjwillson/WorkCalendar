@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Sheets Agenda Calendar</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .date {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    .event {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .event h3 {
+        margin-top: 0;
+    }
+</style>
+</head>
+<body>
+<div class="container" id="calendar">
+    <!-- Events will be dynamically added here -->
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const SPREADSHEET_ID = '1RoOxUNimAcFGmd_f0DWRyUPXwQm5Dtv5_3Dj8yE80hg';
+    const API_KEY = 'AIzaSyDKaPZsMFk8KfNf0yKeHeErs0PY0kBtqNM';
+
+    // Load Google Sheets API
+    gapi.load('client', initClient);
+
+    async function initClient() {
+        await gapi.client.init({
+            apiKey: API_KEY,
+            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+        });
+
+        fetchEvents();
+    }
+
+    async function fetchEvents() {
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'CalendarData!A1:I'
+        });
+
+        const eventsData = response.result.values;
+
+        if (eventsData) {
+            const calendarDiv = document.getElementById('calendar');
+            let currentDate = '';
+
+            eventsData.sort((a, b) => new Date(a[1]) - new Date(b[1])); // Sort events by start date
+
+            eventsData.forEach(event => {
+                const [subject, start, end, allDay, showAs, location, responseType, id, timeZone] = event;
+                const startDate = new Date(start).toLocaleDateString();
+                
+                if (startDate !== currentDate) {
+                    // Create a new date header if the date changes
+                    const dateDiv = document.createElement('div');
+                    dateDiv.classList.add('date');
+                    dateDiv.textContent = startDate;
+                    calendarDiv.appendChild(dateDiv);
+                    currentDate = startDate;
+                }
+
+                const eventDiv = document.createElement('div');
+                eventDiv.classList.add('event');
+
+                const startTime = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const endTime = new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const eventHTML = `
+                    <h3>${subject}</h3>
+                    <p><strong>Start:</strong> ${startTime}</p>
+                    <p><strong>End:</strong> ${endTime}</p>
+                    <p><strong>All Day:</strong> ${allDay}</p>
+                    <p><strong>Show As:</strong> ${showAs}</p>
+                    <p><strong>Location:</strong> ${location}</p>
+                    <p><strong>Response Type:</strong> ${responseType}</p>
+                    <p><strong>ID:</strong> ${id}</p>
+                `;
+
+                eventDiv.innerHTML = eventHTML;
+                calendarDiv.appendChild(eventDiv);
+            });
+        } else {
+            console.error('No data found.');
+        }
+    }
+});
+</script>
+
+<!-- Load the Google API Client Library -->
+<script src="https://apis.google.com/js/api.js"></script>
+</body>
+</html>
