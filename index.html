@@ -8,8 +8,8 @@
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
+        margin: 10px;
+        padding: 10px;
     }
     .container {
         max-width: 800px;
@@ -25,6 +25,7 @@
         margin-top: 20px;
     }
     .event {
+        font-size: 12px;
         background-color: #f0f0f0;
         border-radius: 5px;
         padding: 10px;
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchEvents() {
         const response = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'CalendarData!A2:I' // Assuming data starts from A2 and ends at I (adjust range as needed)
+            range: 'CalendarData!A2:I'
         });
 
         const eventsData = response.result.values;
@@ -91,8 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const eventDiv = document.createElement('div');
                     eventDiv.classList.add('event');
 
-                    const startTime = allDay ? '' : new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const endTime = allDay ? '' : new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const startTime = allDay ? 'FALSE' : new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const endTime = allDay ? 'FALSE' : new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                     const eventHTML = `
                         <h3>${subject}</h3>
@@ -102,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p><strong>Show As:</strong> ${showAs}</p>
                         <p><strong>Location:</strong> ${location}</p>
                         <p><strong>Response Type:</strong> ${responseType}</p>
-                        <p><strong>ID:</strong> ${id}</p>
                     `;
 
                     eventDiv.innerHTML = eventHTML;
