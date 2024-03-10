@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchEvents() {
         const response = await gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'CalendarData!A1:I'
+            range: 'CalendarData!A2:I' // Assuming data starts from A2 and ends at I (adjust range as needed)
         });
 
         const eventsData = response.result.values;
@@ -74,36 +74,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
             eventsData.forEach(event => {
                 const [subject, start, end, allDay, showAs, location, responseType, id, timeZone] = event;
-                const startDate = new Date(start).toLocaleDateString();
+                const startDate = new Date(start);
                 
-                if (startDate !== currentDate) {
-                    // Create a new date header if the date changes
-                    const dateDiv = document.createElement('div');
-                    dateDiv.classList.add('date');
-                    dateDiv.textContent = startDate;
-                    calendarDiv.appendChild(dateDiv);
-                    currentDate = startDate;
+                // Only display events where the start date is equal to or after today
+                if (startDate >= new Date()) {
+                    const startDateFormatted = startDate.toLocaleDateString('en-UK');
+                    if (startDateFormatted !== currentDate) {
+                        // Create a new date header if the date changes
+                        const dateDiv = document.createElement('div');
+                        dateDiv.classList.add('date');
+                        dateDiv.textContent = startDateFormatted;
+                        calendarDiv.appendChild(dateDiv);
+                        currentDate = startDateFormatted;
+                    }
+
+                    const eventDiv = document.createElement('div');
+                    eventDiv.classList.add('event');
+
+                    const startTime = allDay ? '' : new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const endTime = allDay ? '' : new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    const eventHTML = `
+                        <h3>${subject}</h3>
+                        ${!allDay ? `<p><strong>Start:</strong> ${startTime}</p>` : ''}
+                        ${!allDay ? `<p><strong>End:</strong> ${endTime}</p>` : ''}
+                        <p><strong>All Day:</strong> ${allDay}</p>
+                        <p><strong>Show As:</strong> ${showAs}</p>
+                        <p><strong>Location:</strong> ${location}</p>
+                        <p><strong>Response Type:</strong> ${responseType}</p>
+                        <p><strong>ID:</strong> ${id}</p>
+                    `;
+
+                    eventDiv.innerHTML = eventHTML;
+                    calendarDiv.appendChild(eventDiv);
                 }
-
-                const eventDiv = document.createElement('div');
-                eventDiv.classList.add('event');
-
-                const startTime = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const endTime = new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const eventHTML = `
-                    <h3>${subject}</h3>
-                    <p><strong>Start:</strong> ${startTime}</p>
-                    <p><strong>End:</strong> ${endTime}</p>
-                    <p><strong>All Day:</strong> ${allDay}</p>
-                    <p><strong>Show As:</strong> ${showAs}</p>
-                    <p><strong>Location:</strong> ${location}</p>
-                    <p><strong>Response Type:</strong> ${responseType}</p>
-                    <p><strong>ID:</strong> ${id}</p>
-                `;
-
-                eventDiv.innerHTML = eventHTML;
-                calendarDiv.appendChild(eventDiv);
             });
         } else {
             console.error('No data found.');
