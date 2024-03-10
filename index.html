@@ -92,6 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const eventDiv = document.createElement('div');
                     eventDiv.classList.add('event');
 
+                    const startTime = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const endTime = new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                     const eventHTML = `
                         <h3>${subject}</h3>
                         <p>${startTime} - ${endTime}</p>
