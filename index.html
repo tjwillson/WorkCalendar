@@ -8,13 +8,13 @@
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
+        margin: 10px;
+        padding: 10px;
     }
     .container {
         max-width: 800px;
         margin: 20px auto;
-        padding: 20px;
+        padding: 10px;
         background-color: #fff;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -28,7 +28,7 @@
         font-size: 12px;
         background-color: #f0f0f0;
         border-radius: 5px;
-        padding: 10px;
+        padding: 5px;
         margin-top: 10px;
         box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
@@ -92,19 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const eventDiv = document.createElement('div');
                     eventDiv.classList.add('event');
 
-                    let eventHTML = `<h3>${subject}</h3>`;
-                    if (!allDay) {
-                        const startTime = new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const endTime = new Date(end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        eventHTML += `<p><strong>Start:</strong> ${startTime}</p>`;
-                        eventHTML += `<p><strong>End:</strong> ${endTime}</p>`;
-                    }
-                    
-                    eventHTML += `
-                        <p><strong>All Day:</strong> ${allDay}</p>
-                        <p><strong>Show As:</strong> ${showAs}</p>
-                        <p><strong>Location:</strong> ${location}</p>
-                        <p><strong>Response Type:</strong> ${responseType}</p>
+                    const eventHTML = `
+                        <h3>${subject}</h3>
+                        <p>${startTime} - ${endTime}</p>
+                        <p><${location}</p>
+                        <p>${responseType} - ${showAs}</p>
                     `;
 
                     eventDiv.innerHTML = eventHTML;
